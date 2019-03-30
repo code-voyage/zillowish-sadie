@@ -8,7 +8,7 @@ import $ from 'jquery';
 
 class App extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
       house: {},
@@ -20,40 +20,42 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    let id = window.location.pathname.split('/')[1]; //revise
-    $.get(`http://localhost:3001/houses/${id}`, (data) => {
-      let house = data[0];
+    let id = window.location.pathname;
+    (id === '/') ? id = 1 : id;
+    $.get(`http://localhost:3001/houses${id}`, (data) => {
+      let { street, city, state, zipcode, description } = data[0];
       this.setState({
         house: {
-          street: house.street,
-          city: house.city,
-          state: house.state,
-          zipcode: house.zipcode,
-          description: house.description
+          street,
+          city,
+          state,
+          zipcode,
+          description
         }
       });
-
-      $.get(`http://localhost:3001/prices/${id}`, (data) => {
-        this.setState({price: data[0].price})
+      $.get(`http://localhost:3001/prices${id}`, (data) => {
+        const { price } = data[0];
+        this.setState({ price });
       });
-
     });
   }
 
   render() {
+    const { house, beds, baths, sqft, price } = this.state;
+
     return (
       <div id='houseSummary'>
         <div id='addressPrice'>
           <div id='addressStats'>
-            <Address house={this.state.house} />
-            <HouseStats beds={this.state.beds} baths={this.state.baths} sqft={this.state.sqft}/>
+            <Address house={house} />
+            <HouseStats beds={beds} baths={baths} sqft={sqft}/>
           </div>
           <div id='housePrice'>
-            <Price price={this.state.price}/>
+            <Price price={price}/>
           </div>
         </div>
         <div id='houseDescription'>
-          <HouseDescription house={this.state.house} />
+          <HouseDescription house={house} />
         </div>
       </div>
     )
